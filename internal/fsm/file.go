@@ -13,16 +13,16 @@ type File struct {
 	Path string
 }
 
-func (f File) Delete() error {
-	if util.IsExist(f.Path) {
+func (f *File) Delete() error {
+	if !util.IsExist(f.Path) {
 		return errors.New(errorCode.FileNotFound)
 	}
 
 	return os.Remove(f.Path)
 }
 
-func (f File) Rename(newFilename string) error {
-	if util.IsExist(f.Path) {
+func (f *File) Rename(newFilename string) error {
+	if !util.IsExist(f.Path) {
 		return errors.New(errorCode.FileNotFound)
 	}
 
@@ -35,8 +35,8 @@ func (f File) Rename(newFilename string) error {
 	return os.Rename(f.Path, newPath)
 }
 
-func (f File) Move(newDir string) error {
-	if util.IsExist(f.Path) {
+func (f *File) Move(newDir string) error {
+	if !util.IsExist(f.Path) {
 		return errors.New(errorCode.FileNotFound)
 	}
 

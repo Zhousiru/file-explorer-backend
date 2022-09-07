@@ -11,6 +11,7 @@ func init() {
 func StartServer(addr string) error {
 	r := gin.New()
 	r.Use(Logger)
+	r.GET("/getInfo/*path", GetInfo)
 
 	return r.Run(addr)
 }
