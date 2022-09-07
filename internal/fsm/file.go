@@ -25,7 +25,7 @@ func (f *File) SetPath(relPath string) error {
 }
 
 func (f *File) Delete() error {
-	return os.Remove(f.fullPath)
+	return os.RemoveAll(f.fullPath)
 }
 
 func (f *File) Rename(newFilename string) error {
