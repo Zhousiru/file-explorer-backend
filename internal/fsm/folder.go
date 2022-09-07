@@ -1,12 +1,11 @@
 package fsm
 
 import (
-	"errors"
 	"os"
 	"path"
+	"path/filepath"
 
-	errorCode "github.com/Zhousiru/file-explorer-backend/internal/error_code"
-	"github.com/Zhousiru/file-explorer-backend/internal/util"
+	"github.com/Zhousiru/file-explorer-backend/internal/config"
 )
 
 const (
@@ -15,9 +14,9 @@ const (
 )
 
 type FolderSub struct {
-	Name     string
-	Path     string
-	IsFolder bool
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	IsFolder bool   `json:"isFolder"`
 }
 
 type Folder struct {
@@ -25,11 +24,7 @@ type Folder struct {
 }
 
 func (f *Folder) GetSub(flag int) ([]*FolderSub, error) {
-	if !util.IsExist(f.Path) {
-		return nil, errors.New(errorCode.FileNotFound)
-	}
-
-	sub, err := os.ReadDir(f.Path)
+	sub, err := os.ReadDir(f.fullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +45,16 @@ func (f *Folder) GetSub(flag int) ([]*FolderSub, error) {
 			}
 		}
 
+		fullSubPath := path.Join(f.fullPath, v.Name())
+
 		el := new(FolderSub)
 		el.Name = v.Name()
-		el.Path = path.Join(f.Path, v.Name())
+
+		el.Path, err = filepath.Rel(config.Get(config.K_ROOT), fullSubPath)
+		if err != nil {
+			return nil, err
+		}
+
 		el.IsFolder = isDir
 
 		list = append(list, el)

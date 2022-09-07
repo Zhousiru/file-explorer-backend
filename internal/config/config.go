@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/Zhousiru/file-explorer-backend/internal/log"
-	"github.com/Zhousiru/file-explorer-backend/internal/util"
 	"github.com/buger/jsonparser"
 )
 
@@ -22,12 +21,12 @@ func init() {
 }
 
 func Load() {
-	if !util.IsExist(configPath) {
+	_, err := os.Stat(configPath)
+	if err != nil {
 		log.Err("config not found")
 		os.Exit(-1)
 	}
 
-	var err error
 	configData, err = os.ReadFile(configPath)
 	if err != nil {
 		log.Err(err.Error())

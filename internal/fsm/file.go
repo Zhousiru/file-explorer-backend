@@ -5,55 +5,56 @@ import (
 	"os"
 	"path"
 
+	"github.com/Zhousiru/file-explorer-backend/internal/config"
 	errorCode "github.com/Zhousiru/file-explorer-backend/internal/error_code"
 	"github.com/Zhousiru/file-explorer-backend/internal/util"
 )
 
 type File struct {
-	Path string
+	fullPath string
+}
+
+func (f *File) SetPath(relPath string) error {
+	fullPath := path.Join(config.Get(config.K_ROOT), relPath)
+	if !util.IsExist(fullPath) {
+		return errors.New(errorCode.FileNotFound)
+	}
+
+	f.fullPath = fullPath
+	return nil
 }
 
 func (f *File) Delete() error {
-	if !util.IsExist(f.Path) {
-		return errors.New(errorCode.FileNotFound)
-	}
-
-	return os.Remove(f.Path)
+	return os.Remove(f.fullPath)
 }
 
 func (f *File) Rename(newFilename string) error {
-	if !util.IsExist(f.Path) {
-		return errors.New(errorCode.FileNotFound)
-	}
-
-	dir := path.Dir(f.Path)
+	dir := path.Dir(f.fullPath)
 	newPath := path.Join(dir, newFilename)
 	if util.IsExist(newPath) {
 		return errors.New(errorCode.FileAlreadyExist)
 	}
 
-	return os.Rename(f.Path, newPath)
+	return os.Rename(f.fullPath, newPath)
 }
 
 func (f *File) Move(newDir string) error {
-	if !util.IsExist(f.Path) {
-		return errors.New(errorCode.FileNotFound)
-	}
+	fullNewDir := path.Join(config.Get(config.K_ROOT), newDir)
 
-	filename := path.Base(f.Path)
-	newPath := path.Join(newDir, filename)
+	filename := path.Base(f.fullPath)
+	newFullPath := path.Join(fullNewDir, filename)
 
-	if util.IsExist(newPath) {
+	if util.IsExist(newFullPath) {
 		return errors.New(errorCode.FileAlreadyExist)
 	}
 
-	if !util.IsExist(newDir) {
+	if !util.IsExist(fullNewDir) {
 		// new dir not exist
-		err := os.MkdirAll(newDir, os.ModePerm)
+		err := os.MkdirAll(fullNewDir, os.ModePerm)
 		if err != nil {
 			return err
 		}
 	}
 
-	return os.Rename(f.Path, newPath)
+	return os.Rename(f.fullPath, newFullPath)
 }
