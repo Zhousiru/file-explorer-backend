@@ -22,3 +22,6 @@ go.work
 
 # config file
 config.json
+
+# default data folder
+data
