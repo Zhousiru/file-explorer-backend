@@ -50,11 +50,12 @@ func (f *Folder) GetSub(flag int) ([]*FolderSub, error) {
 		el := new(FolderSub)
 		el.Name = v.Name()
 
-		el.Path, err = filepath.Rel(config.Get(config.K_ROOT), fullSubPath)
+		tempPath, err := filepath.Rel(config.Get(config.K_ROOT), fullSubPath)
 		if err != nil {
 			return nil, err
 		}
 
+		el.Path = filepath.ToSlash(tempPath)
 		el.IsFolder = isDir
 
 		list = append(list, el)
