@@ -19,6 +19,10 @@ func action(c *gin.Context) {
 		rename(c, path)
 	case "move":
 		move(c, path)
+	case "get":
+		get(c, path)
+	case "info":
+		info(c, path)
 	default:
 		c.JSON(400, Resp{
 			Err: "invalid action",
@@ -28,18 +32,18 @@ func action(c *gin.Context) {
 }
 
 func list(c *gin.Context, path string) {
-	if !util.IsDir(path) {
-		c.JSON(400, Resp{
-			Err: "it's a file",
-		})
-		return
-	}
-
 	f := new(fsm.Folder)
 	err := f.SetPath(path)
 	if err != nil {
 		c.JSON(400, Resp{
 			Err: err.Error(),
+		})
+		return
+	}
+
+	if !util.IsDir(path) {
+		c.JSON(400, Resp{
+			Err: "it's a file",
 		})
 		return
 	}
@@ -134,5 +138,51 @@ func move(c *gin.Context, path string) {
 
 	c.JSON(200, Resp{
 		Msg: "ok",
+	})
+}
+
+func get(c *gin.Context, path string) {
+	if util.IsDir(path) {
+		c.JSON(400, Resp{
+			Err: "it's a folder",
+		})
+		return
+	}
+
+	f := new(fsm.File)
+	err := f.SetPath(path)
+	if err != nil {
+		c.JSON(400, Resp{
+			Err: err.Error(),
+		})
+		return
+	}
+
+	fullPath := f.GetFullPath()
+	c.FileAttachment(fullPath, f.GetFilename())
+}
+
+func info(c *gin.Context, path string) {
+	f := new(fsm.File)
+	err := f.SetPath(path)
+	if err != nil {
+		c.JSON(400, Resp{
+			Err: err.Error(),
+		})
+		return
+	}
+
+	modTime, err := f.GetFormattedModTime()
+	if err != nil {
+		c.JSON(500, Resp{
+			Err: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, Resp{
+		Payload: gin.H{
+			"modTime": modTime,
+		},
 	})
 }

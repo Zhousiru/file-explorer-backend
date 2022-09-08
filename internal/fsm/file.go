@@ -12,6 +12,7 @@ import (
 
 type File struct {
 	fullPath string
+	filename string
 }
 
 func (f *File) SetPath(relPath string) error {
@@ -21,6 +22,7 @@ func (f *File) SetPath(relPath string) error {
 	}
 
 	f.fullPath = fullPath
+	f.filename = path.Base(f.fullPath)
 	return nil
 }
 
@@ -41,8 +43,7 @@ func (f *File) Rename(newFilename string) error {
 func (f *File) Move(newDir string) error {
 	fullNewDir := path.Join(config.Get(config.K_ROOT), newDir)
 
-	filename := path.Base(f.fullPath)
-	newFullPath := path.Join(fullNewDir, filename)
+	newFullPath := path.Join(fullNewDir, f.filename)
 
 	if util.IsExist(newFullPath) {
 		return errors.New(errorCode.FileAlreadyExist)
@@ -57,4 +58,20 @@ func (f *File) Move(newDir string) error {
 	}
 
 	return os.Rename(f.fullPath, newFullPath)
+}
+
+func (f *File) GetFullPath() string {
+	return f.fullPath
+}
+
+func (f *File) GetFilename() string {
+	return f.filename
+}
+
+func (f *File) GetFormattedModTime() (string, error) {
+	info, err := os.Stat(f.fullPath)
+	if err != nil {
+		return "", err
+	}
+	return info.ModTime().Format("2006-01-02 15:04:05"), nil
 }
