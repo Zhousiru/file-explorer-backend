@@ -21,13 +21,3 @@ func isInvalidQuery(c *gin.Context, q ...string) bool {
 	}
 	return false
 }
-
-func isInvalidMethod(c *gin.Context, m string) bool {
-	if c.Request.Method != m {
-		c.JSON(400, Resp{
-			Err: "invalid method",
-		})
-		return true
-	}
-	return false
-}

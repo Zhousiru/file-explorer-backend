@@ -12,12 +12,13 @@ func StartServer(addr string) error {
 	r := gin.New()
 	r.Use(Logger)
 	r.Use(Cors)
-	r.Any("/*path", action)
+	r.GET("/*path", actionGet)
+	r.POST("/*path", actionPost)
 
 	return r.Run(addr)
 }
 
-func action(c *gin.Context) {
+func actionGet(c *gin.Context) {
 	action := c.Query("action")
 	path := c.Param("path")
 
@@ -34,6 +35,19 @@ func action(c *gin.Context) {
 		get(c, path)
 	case "info":
 		info(c, path)
+	default:
+		c.JSON(400, Resp{
+			Err: "invalid action",
+		})
+		return
+	}
+}
+
+func actionPost(c *gin.Context) {
+	action := c.Query("action")
+	path := c.Param("path")
+
+	switch action {
 	case "upload":
 		upload(c, path)
 	default:
