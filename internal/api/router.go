@@ -36,6 +36,8 @@ func actionGet(c *gin.Context) {
 		get(c, path)
 	case "info":
 		info(c, path)
+	case "newFolder":
+		newFolder(c, path)
 	default:
 		c.JSON(400, Resp{
 			Err: "invalid action",
