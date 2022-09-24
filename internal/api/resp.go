@@ -10,7 +10,7 @@ type Resp struct {
 	Msg     string      `json:"msg"`
 }
 
-func isValidQuery(c *gin.Context, q ...string) bool {
+func isInvalidQuery(c *gin.Context, q ...string) bool {
 	for _, el := range q {
 		if c.Query(el) == "" {
 			c.JSON(400, Resp{
@@ -18,6 +18,16 @@ func isValidQuery(c *gin.Context, q ...string) bool {
 			})
 			return true
 		}
+	}
+	return false
+}
+
+func isInvalidMethod(c *gin.Context, m string) bool {
+	if c.Request.Method != m {
+		c.JSON(400, Resp{
+			Err: "invalid method",
+		})
+		return true
 	}
 	return false
 }
