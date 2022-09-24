@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Zhousiru/file-explorer-backend/internal/config"
 	"github.com/Zhousiru/file-explorer-backend/internal/log"
 	"github.com/gin-gonic/gin"
 )
@@ -31,5 +32,18 @@ func Logger(c *gin.Context) {
 
 func Cors(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
+	c.Next()
+}
+
+func Auth(c *gin.Context) {
+	key := c.Query("key")
+
+	if key != config.Get("key") {
+		c.JSON(403, Resp{
+			Err: "invalid key",
+		})
+		c.Abort()
+	}
+
 	c.Next()
 }

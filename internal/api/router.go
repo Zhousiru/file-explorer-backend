@@ -12,6 +12,7 @@ func StartServer(addr string) error {
 	r := gin.New()
 	r.Use(Logger)
 	r.Use(Cors)
+	r.Use(Auth)
 	r.GET("/*path", actionGet)
 	r.POST("/*path", actionPost)
 
