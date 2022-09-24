@@ -15,6 +15,9 @@ func newFolder(c *gin.Context, target string) {
 		return
 	}
 	name := c.Query("name")
+	if isInvalidPath(c, name) {
+		return
+	}
 
 	fullPath := path.Join(config.Get(config.K_ROOT), target, name)
 

@@ -10,6 +10,9 @@ func move(c *gin.Context, path string) {
 		return
 	}
 	newPath := c.Query("new")
+	if isInvalidPath(c, newPath) {
+		return
+	}
 
 	f := new(fsm.File)
 	err := f.SetPath(path)

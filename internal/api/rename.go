@@ -10,6 +10,9 @@ func rename(c *gin.Context, path string) {
 		return
 	}
 	newName := c.Query("new")
+	if isInvalidPath(c, newName) {
+		return
+	}
 
 	f := new(fsm.File)
 	err := f.SetPath(path)

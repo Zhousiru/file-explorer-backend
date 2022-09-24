@@ -13,50 +13,57 @@ func StartServer(addr string) error {
 	r.Use(Logger)
 	r.Use(Cors)
 	r.Use(Auth)
-	r.GET("/*path", actionGet)
-	r.POST("/*path", actionPost)
+	r.GET("/*path", func(c *gin.Context) {
+		action(c, "GET")
+	})
+	r.POST("/*path", func(c *gin.Context) {
+		action(c, "POST")
+	})
 
 	return r.Run(addr)
 }
 
-func actionGet(c *gin.Context) {
+func action(c *gin.Context, method string) {
 	action := c.Query("action")
-	path := c.Param("path")
+	target := c.Param("path")
 
-	switch action {
-	case "list":
-		list(c, path)
-	case "del":
-		del(c, path)
-	case "rename":
-		rename(c, path)
-	case "move":
-		move(c, path)
-	case "get":
-		get(c, path)
-	case "info":
-		info(c, path)
-	case "newFolder":
-		newFolder(c, path)
-	default:
-		c.JSON(400, Resp{
-			Err: "invalid action",
-		})
+	if isInvalidPath(c, target) {
 		return
 	}
-}
 
-func actionPost(c *gin.Context) {
-	action := c.Query("action")
-	path := c.Param("path")
+	if method == "GET" {
+		switch action {
+		case "list":
+			list(c, target)
+		case "del":
+			del(c, target)
+		case "rename":
+			rename(c, target)
+		case "move":
+			move(c, target)
+		case "get":
+			get(c, target)
+		case "info":
+			info(c, target)
+		case "newFolder":
+			newFolder(c, target)
+		default:
+			c.JSON(400, Resp{
+				Err: "invalid action",
+			})
+			return
+		}
+	}
 
-	switch action {
-	case "upload":
-		upload(c, path)
-	default:
-		c.JSON(400, Resp{
-			Err: "invalid action",
-		})
-		return
+	if method == "POST" {
+		switch action {
+		case "upload":
+			upload(c, target)
+		default:
+			c.JSON(400, Resp{
+				Err: "invalid action",
+			})
+			return
+		}
 	}
 }
