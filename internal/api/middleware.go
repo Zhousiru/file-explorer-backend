@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Zhousiru/file-explorer-backend/internal/config"
@@ -25,7 +24,7 @@ func Logger(c *gin.Context) {
 		path = path + "?" + raw
 	}
 
-	log.Info(fmt.Sprintf("%s [%s] [%s %s] %d", log.GetColored("[API]", log.Green), latency, method, path, statusCode))
+	log.Info("%s [%s] [%s %s] %d", log.GetColored("[API]", log.Green), latency, method, path, statusCode)
 
 	c.Next()
 }
